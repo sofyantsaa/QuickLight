@@ -1,20 +1,52 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [style.--background]="isLightOn ? selectedColor : '#0a0a0a'">
+  <div class="app-container">
+    
+    <canvas #visualizerCanvas class="visualizer" [class.show]="isVoiceMode"></canvas>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <div class="main-content" *ngIf="!isLightOn && !isSOS">
+      <div class="glass-card">
+        <h1 class="logo">quichliht</h1>
+        
+        <div class="picker-box">
+          <div class="preview-circle" [style.background]="selectedColor">
+            <input type="color" [(ngModel)]="selectedColor" class="input-hidden">
+          </div>
+          <p class="hint">Custom Color</p>
+        </div>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+        <div class="presets">
+          <div class="dot red" (click)="setPreset('#ff3b30')"></div>
+          <div class="dot green" (click)="setPreset('#4cd964')"></div>
+          <div class="dot blue" (click)="setPreset('#007aff')"></div>
+          <div class="dot white" (click)="setPreset('#ffffff')"></div>
+        </div>
+
+        <div class="utils">
+          <button class="u-btn sos" (click)="toggleSOS()">
+            <ion-icon name="warning"></ion-icon>
+            <span>SOS</span>
+          </button>
+          <button class="u-btn" (click)="activateTimer()">
+            <ion-icon name="timer-outline"></ion-icon>
+            <span>10s</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="center-trigger">
+        <button class="power-on" (click)="toggleVoiceMode()">
+          <ion-icon name="mic"></ion-icon>
+          <p>START MODE</p>
+        </button>
+      </div>
+    </div>
+
+    <div class="bottom-zone" *ngIf="isLightOn || isSOS">
+      <button class="power-off-transparent" (click)="stopEverything()">
+        <ion-icon name="power-outline"></ion-icon>
+        <span>STOP / TURN OFF</span>
+      </button>
+    </div>
+
   </div>
 </ion-content>
