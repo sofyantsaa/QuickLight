@@ -30,21 +30,38 @@
   }
 }
 
-// TOMBOL OFF TRANSPARAN
-.bottom-zone {
-  position: absolute; bottom: 50px; width: 100%; display: flex; justify-content: center; z-index: 30;
-  .power-off-transparent {
-    width: 80%; max-width: 280px; padding: 18px; border-radius: 50px; 
-    border: 1px solid rgba(255, 255, 255, 0.3); // Garis tepi tipis
-    background: rgba(255, 255, 255, 0.15); // Background tipis
-    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); // Efek kaca
-    color: #fff; font-weight: 900; font-size: 1rem;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    transition: 0.2s;
-    ion-icon { font-size: 1.5rem; }
-    &:active { background: rgba(255, 255, 255, 0.3); transform: scale(0.95); }
-  }
+.footer-action {
+  position: absolute;
+  bottom: 40px; // Sama tingginya dengan posisi nama 'by sofyantsa'
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.btn-off-transparent {
+  --background: rgba(255, 255, 255, 0.15); // Transparan tipis
+  --background-activated: rgba(255, 255, 255, 0.3);
+  --color: white; // Tulisan tetap putih
+  --border-radius: 50px;
+  --border-color: rgba(255, 255, 255, 0.5); // Garis tepi tipis
+  --border-style: solid;
+  --border-width: 1px;
+  --box-shadow: none;
+  height: 40px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  
+  // Efek blur di belakang tombol biar estetik (Frosted Glass)
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+// Tambahan biar isi content gak bisa scroll
+ion-content {
+  --overflow: hidden;
 }
 
 .visualizer {
@@ -54,21 +71,30 @@
 }
 
 .footer-credit {
-  position: fixed; // Pakai fixed biar dia nggak ikut kegulung/scroll
-  bottom: 30px;    // Naikkan sedikit biar nggak mepet bgt sama navigasi bawah HP
+  position: absolute;
+  bottom: 40px;
   left: 0;
-  right: 0;
-  z-index: 999;    // Biar paling depan, nggak ketutup tombol lain
+  width: 100%;
   text-align: center;
   pointer-events: none;
+  animation: fadeIn 1s ease-in; // Tambah efek muncul halus
 
   p {
-    color: white;  // Putih solid dulu biar kelihatan jelas
-    font-size: 0.9rem;
-    font-weight: bold; // Tebalkan dikit
-    letter-spacing: 1.5px;
-    opacity: 0.6;  // Kasih transparansi dikit biar estetik
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8); // Kasih bayangan item biar kebaca di warna apa aja
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
     margin: 0;
   }
+}
+
+// Efek muncul halus biar estetik
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// Tambahkan ini di paling atas file SCSS untuk mematikan scroll total
+ion-content {
+  --overflow: hidden; 
 }

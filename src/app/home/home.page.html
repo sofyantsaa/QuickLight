@@ -41,17 +41,15 @@
       </div>
     </div>
 
-    <div class="bottom-zone" *ngIf="isLightOn || isSOS">
-      <button class="power-off-transparent" (click)="stopEverything()">
-        <ion-icon name="power-outline"></ion-icon>
-        <span>STOP / TURN OFF</span>
-      </button>
-    </div>
+      <div class="footer-action" *ngIf="isLightOn">
+    <ion-button (click)="stopEverything()" class="btn-off-transparent">
+      OFF
+    </ion-button>
+  </div>
 
   </div>
-      <ion-content [fullscreen]="true" [style.--background]="isLightOn ? selectedColor : '#121212'">
-      
-      <div class="footer-credit">
-        <p>by sofyantsa</p>
+        
+     <div class="footer-credit" *ngIf="!isLightOn">
+      <p>by sofyantsa</p>
       </div>
 </ion-content>
