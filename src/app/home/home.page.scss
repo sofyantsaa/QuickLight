@@ -41,22 +41,22 @@
 }
 
 .btn-off-transparent {
-  --background: rgba(255, 255, 255, 0.15); // Transparan tipis
-  --background-activated: rgba(255, 255, 255, 0.3);
-  --color: white; // Tulisan tetap putih
+  // Ganti dari rgba transparan menjadi warna solid atau lebih pekat
+  --background: #ff3b30; // Kita pakai merah solid agar kontras di atas warna putih
+  --background-activated: #c32219;
+  --color: white; 
   --border-radius: 50px;
-  --border-color: rgba(255, 255, 255, 0.5); // Garis tepi tipis
-  --border-style: solid;
-  --border-width: 1px;
-  --box-shadow: none;
+  --border-style: none; // Hapus garis tepi karena sudah solid
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); // Kasih bayangan dikit biar "timbul"
+  
   height: 40px;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: bold;
   letter-spacing: 2px;
   
-  // Efek blur di belakang tombol biar estetik (Frosted Glass)
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  // Matikan efek blur karena sudah tidak transparan
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 // Tambahan biar isi content gak bisa scroll
