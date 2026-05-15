@@ -1,4 +1,4 @@
-package io.quichliht.app;
+package com.sofyantsa.quickflash;
 
 import com.getcapacitor.BridgeActivity;
 

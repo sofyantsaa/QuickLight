@@ -1,18 +1,12 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'QuickLight',
+  appId: 'com.sofyantsa.quickflash',
+  appName: 'QuickFlash',
   webDir: 'www',
-  bundledWebRuntime: false,
-  plugins: {
-    SplashScreen: {
-      launchShowDuration: 0, // Logo muncul cuma 1 detik (biar gak kelamaan)
-      backgroundColor: "#121212", // Ganti background birunya jadi item biar senada sama app kamu
-      showSpinner: false, // Ngilangin loading muter-muter yang biru itu
-      androidScaleType: "CENTER_CROP"
-    }
+  server: {
+    androidScheme: 'https'
   }
 };
 
-export default config;  
+export default config;
