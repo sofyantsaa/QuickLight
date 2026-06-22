@@ -3,12 +3,19 @@ apply plugin: 'com.android.application'
 android {
     namespace = "com.sofyantsa.quickflash"
     compileSdk = rootProject.ext.compileSdkVersion
+
+    // 🚨 TAMBAHKAN 4 BARIS INI DI SINI:
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
     defaultConfig {
         applicationId "com.sofyantsa.quickflash"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

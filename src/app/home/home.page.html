@@ -1,52 +1,66 @@
-<ion-content [style.--background]="isLightOn ? selectedColor : '#0a0a0a'">
-  <div class="app-container">
-    
-    <canvas #visualizerCanvas class="visualizer" [class.show]="isVoiceMode"></canvas>
+<ion-header class="ion-no-border" *ngIf="!isFeatureActive">
+  <ion-toolbar style="--background: #000000; padding-top: var(--ion-safe-area-top);">
+    <ion-title class="ion-text-center">
+      <span style="font-weight: 800; letter-spacing: 2px; color: #ffffff;">QUICK</span><span style="color: #FFCA28; font-weight: 800; letter-spacing: 2px;">LIGHT</span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
 
-    <div class="main-content" *ngIf="!isLightOn && !isSOS">
-      <div class="glass-card">
-        <h1 class="logo">QuickLight</h1>
+<ion-content [fullscreen]="true" style="--background: #000000;">
+  
+  <canvas #visualizerCanvas class="visualizer" [class.show]="isVoiceMode"></canvas>
+
+  <div class="app-container" [style.background-color]="isLightOn ? selectedColor : '#000000'">
+    <div class="main-content">
+      
+      <div class="glass-card" *ngIf="!isFeatureActive">
+        <h1 class="logo">QUICKLIGHT</h1>
+        <p class="hint">Smart Ambient Controller</p>
         
         <div class="picker-box">
-          <div class="preview-circle" [style.background]="selectedColor">
-            <input type="color" [(ngModel)]="selectedColor" class="input-hidden">
+          <div class="preview-circle" [style.background-color]="selectedColor">
+            <input type="color" class="input-hidden" [(ngModel)]="selectedColor" (change)="setPreset(selectedColor)">
           </div>
-          <p class="hint">Custom Color</p>
         </div>
-
+        
         <div class="presets">
           <div class="dot red" (click)="setPreset('#ff3b30')"></div>
           <div class="dot green" (click)="setPreset('#4cd964')"></div>
           <div class="dot blue" (click)="setPreset('#007aff')"></div>
           <div class="dot white" (click)="setPreset('#ffffff')"></div>
         </div>
-
+        
         <div class="utils">
           <button class="u-btn sos" (click)="toggleSOS()">
-            <ion-icon name="warning"></ion-icon>
-            <span>SOS</span>
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span>SOS MODE</span>
           </button>
-          <button class="u-btn" (click)="activateTimer()">
-            <ion-icon name="timer-outline"></ion-icon>
-            <span>10s</span>
+          <button class="u-btn" (click)="toggleVoiceMode()">
+            <ion-icon name="musical-notes-outline"></ion-icon>
+            <span>VOICE/MUSIC</span>
+          </button>
+          <button class="u-btn" (click)="activateTimer()" style="grid-column: span 2;">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>NYALAKAN TIMER (10S)</span>
           </button>
         </div>
       </div>
 
-      <div class="center-trigger">
-        <button class="power-on" (click)="toggleVoiceMode()">
-          <ion-icon name="mic"></ion-icon>
-          <p>START MODE</p>
+      <div class="center-trigger" *ngIf="!isFeatureActive">
+        <button class="power-on" style="background: #ffffff;" (click)="setPreset(selectedColor)">
+          <ion-icon name="power-outline"></ion-icon>
+          <p>TAP TO ON</p>
         </button>
       </div>
+
     </div>
 
-      <div class="footer-action" *ngIf="isLightOn">
-    <ion-button (click)="stopEverything()" class="btn-off-transparent">
-      OFF
-    </ion-button>
+    <div class="footer-action" *ngIf="isFeatureActive">
+      <ion-button class="btn-off-transparent" (click)="stopEverything()">
+        MATIKAN SEMUA FITUR
+      </ion-button>
+    </div>
+    
   </div>
 
-  </div>
-        
 </ion-content>

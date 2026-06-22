@@ -6,6 +6,12 @@ const config: CapacitorConfig = {
   webDir: 'www',
   server: {
     androidScheme: 'https'
+  },
+  plugins: {
+    SplashScreen: {
+      // 🚨 Matikan total pluginnya agar tidak merusak tampilan gambar kustommu
+      disable: true
+    }
   }
 };
 

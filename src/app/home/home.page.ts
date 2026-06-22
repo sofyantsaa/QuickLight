@@ -1,5 +1,5 @@
 import { Component, OnDestroy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
-import { Platform } from '@ionic/angular';
+import { Platform, ToastController } from '@ionic/angular';
 import { App } from '@capacitor/app';
 
 @Component({
@@ -17,6 +17,9 @@ export class HomePage implements OnDestroy {
   isVoiceMode: boolean = false;
   isSOS: boolean = false;
   
+  // KUNCI FIXING: Variabel untuk mengunci agar menu home tidak ikut kedap-kedip
+  isFeatureActive: boolean = false; 
+  
   // Audio & Animation Refs
   audioContext: AudioContext | null = null;
   analyser: AnalyserNode | null = null;
@@ -25,32 +28,55 @@ export class HomePage implements OnDestroy {
   sosInterval: any;
   timerTimeout: any;
 
+  // Variabel untuk fitur Double Tap to Exit
+  private lastBackPress = 0;
+  private timePeriodToExit = 2000; // Toleransi jeda ketukan (2 detik)
+
   constructor(
     private cdr: ChangeDetectorRef, 
-    private platform: Platform
+    private platform: Platform,
+    private toastController: ToastController // Inject ToastController bawaan Ionic
   ) {
-    // LOGIKA TOMBOL KEMBALI ANDROID (Hardware Back Button)
-    this.platform.backButton.subscribeWithPriority(10, () => {
-      if (this.isLightOn || this.isSOS || this.isVoiceMode) {
-        // Jika lampu/fitur aktif, tombol back akan mematikan fiturnya saja
+    this.platform.backButton.subscribeWithPriority(10, async () => {
+      if (this.isFeatureActive || this.isLightOn) {
+        // Jika ada fitur yang aktif, ketukan pertama hanya mematikan fitur tersebut
         this.stopEverything();
       } else {
-        // Jika aplikasi sedang standby (mati), tombol back akan menutup aplikasi
-        App.exitApp();
+        // 🎯 LOGIKA DOUBLE TAP TO EXIT
+        const currentTime = new Date().getTime();
+        
+        if (currentTime - this.lastBackPress < this.timePeriodToExit) {
+          // Jika ketukan kedua dilakukan kurang dari 2 detik, aplikasi ditutup rapat
+          App.exitApp();
+        } else {
+          // Jika baru ketukan pertama, simpan waktu ketukan dan munculkan toast notifikasi
+          this.lastBackPress = currentTime;
+          await this.showExitToast();
+        }
       }
     });
   }
 
-  // --- FUNGSI MODE MUSIK / VOICE ---
+  // --- MODE MANUAL PICKER ---
+  setPreset(color: string) {
+    this.stopEverything();
+    this.selectedColor = color;
+    this.isLightOn = true;
+    this.isFeatureActive = true;
+    this.cdr.detectChanges();
+  }
+
+  // --- FUNGSI MODE MUSIK / VOICE (DIOPTIMASI INSTAN & BERDETAK) ---
   async toggleVoiceMode() {
     this.stopEverything();
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.isVoiceMode = true;
       this.isLightOn = true;
+      this.isFeatureActive = true; 
       
-      // Memberi jeda agar canvas Android siap render
-      setTimeout(() => this.startAudioAnalysis(this.stream!), 400);
+      this.startAudioAnalysis(this.stream);
+      this.cdr.detectChanges();
     } catch (err) {
       alert('Izin Microphone diperlukan untuk mode ini!');
     }
@@ -60,7 +86,7 @@ export class HomePage implements OnDestroy {
     this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const source = this.audioContext.createMediaStreamSource(stream);
     this.analyser = this.audioContext.createAnalyser();
-    this.analyser.fftSize = 64; 
+    this.analyser.fftSize = 32; 
     source.connect(this.analyser);
     this.drawVisualizer();
   }
@@ -74,7 +100,9 @@ export class HomePage implements OnDestroy {
     canvas.height = 250;
 
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    
     const draw = () => {
+      if (!this.isVoiceMode) return; 
       this.animationId = requestAnimationFrame(draw);
       this.analyser!.getByteFrequencyData(dataArray);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -86,26 +114,41 @@ export class HomePage implements OnDestroy {
       for (let i = 0; i < dataArray.length; i++) {
         const barHeight = (dataArray[i] / 255) * canvas.height;
         sum += dataArray[i];
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.fillRect(x, canvas.height - barHeight, barWidth - 4, barHeight);
         x += barWidth;
       }
 
-      // Sensitivitas deteksi suara untuk ganti warna
-      if (sum / dataArray.length > 40) {
-        this.selectedColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-        this.cdr.detectChanges();
+      const averageVolume = sum / dataArray.length;
+      const container = document.querySelector('.app-container') as HTMLElement;
+
+      if (container) {
+        if (averageVolume > 15) { 
+          let intensity = averageVolume / 110; 
+          
+          if (intensity > 1) intensity = 1;      
+          if (intensity < 0.15) intensity = 0.15; 
+
+          container.style.opacity = `${intensity}`;
+        } else {
+          container.style.opacity = '0.15';
+        }
       }
+
+      this.cdr.detectChanges();
     };
     draw();
   }
 
-  // --- FUNGSI SOS (KEDAP-KEDIP) ---
+  // --- FUNGSI SOS (KEDAP-KEDIP AMAN) ---
   toggleSOS() {
     this.stopEverything();
     this.isSOS = true;
     this.isLightOn = true;
-    this.selectedColor = '#ff0000';
+    this.isFeatureActive = true; 
+    this.selectedColor = '#ff0000'; 
+    
     this.sosInterval = setInterval(() => {
       this.isLightOn = !this.isLightOn;
       this.cdr.detectChanges();
@@ -116,16 +159,11 @@ export class HomePage implements OnDestroy {
   activateTimer() {
     this.stopEverything();
     this.isLightOn = true;
+    this.isFeatureActive = true;
     this.timerTimeout = setTimeout(() => { 
       this.stopEverything(); 
     }, 10000);
-  }
-
-  // --- PILIH WARNA MANUAL ---
-  setPreset(color: string) {
-    this.stopEverything();
-    this.selectedColor = color;
-    this.isLightOn = true;
+    this.cdr.detectChanges();
   }
 
   // --- FUNGSI STOP SEMUA PROSES ---
@@ -133,6 +171,7 @@ export class HomePage implements OnDestroy {
     this.isVoiceMode = false;
     this.isLightOn = false;
     this.isSOS = false;
+    this.isFeatureActive = false; 
 
     if (this.sosInterval) clearInterval(this.sosInterval);
     if (this.timerTimeout) clearTimeout(this.timerTimeout);
@@ -146,7 +185,25 @@ export class HomePage implements OnDestroy {
       this.stream.getTracks().forEach(track => track.stop());
       this.stream = null;
     }
+
+    const container = document.querySelector('.app-container') as HTMLElement;
+    if (container) {
+      container.style.opacity = '1';
+    }
+
     this.cdr.detectChanges();
+  }
+
+  // --- FUNGSI TOAST NOTIFIKASI KELUAR ---
+  async showExitToast() {
+    const toast = await this.toastController.create({
+      message: 'Ketuk sekali lagi untuk keluar',
+      duration: 2000,
+      position: 'bottom',
+      cssClass: 'custom-exit-toast', // Class kustom yang akan kita hias di SCSS
+      buttons: []
+    });
+    await toast.present();
   }
 
   ngOnDestroy() { 
