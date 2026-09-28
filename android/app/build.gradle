@@ -4,7 +4,6 @@ android {
     namespace = "com.sofyantsa.quickflash"
     compileSdk = rootProject.ext.compileSdkVersion
 
-    // 🚨 TAMBAHKAN 4 BARIS INI DI SINI:
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
